@@ -6,6 +6,7 @@ from rest_framework import generics
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import LoginSerializer, RegisterSerializer
 from .models import UserSession
+from .permissions import IsAdmin, IsAdminOrTrainer, IsStudent
 
 class LoginView(APIView):
     permission_classes=[AllowAny]
@@ -40,3 +41,18 @@ class RegisterView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AdminOnlyView(APIView):
+    permission_classes = [IsAdmin]
+    def get(self, request):
+        return Response({"message": "Hello Admin"})
+    
+class TrainerView(APIView):
+    permission_classes = [IsAdminOrTrainer]
+    def get(self, request):
+        return Response({"message": "Trainer Access"})
+
+class StudentView(APIView):
+    permission_classes = [IsStudent]
+    def get(self, request):
+        return Response({"message": "Student Access"})

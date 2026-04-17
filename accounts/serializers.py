@@ -28,7 +28,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('User Account is Disabled')
         
 
-        ## Generate JWT Tokens
+        ## Generate JWT Tokens 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 

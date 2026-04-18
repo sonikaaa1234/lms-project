@@ -1,0 +1,22 @@
+<a href="/my-courses/">My Courses</a>
+<br><br>
+<h1>Available Courses</h1>
+
+{% for course in courses %}
+    <div>
+        <h3>{{ course.title }}</h3>
+        <p>{{ course.description }}</p>
+        <p>Price: ₹{{ course.price }}</p>
+
+        <a href="{% url 'enroll_course' course.id %}">
+            Enroll
+        </a>
+    </div>
+    <hr>
+{% endfor %}
+
+<a href="/accounts/login/">Login</a>
+<a href="/accounts/logout/">Logout</a>
+<a href="{% url 'course_detail' course.id %}">
+    View Course
+</a>

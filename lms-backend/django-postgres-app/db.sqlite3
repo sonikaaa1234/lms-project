@@ -1,0 +1,7 @@
+db.sqlite3 is the default SQLite database file created by Django. Since you want to use PostgreSQL for your backend, you can remove this file. 
+
+If you need to create a PostgreSQL database, you would typically do that through your PostgreSQL server and configure the connection in your settings.py file. 
+
+Therefore, the contents of db.sqlite3 will be intentionally left blank. 
+
+# This file is intentionally left blank.

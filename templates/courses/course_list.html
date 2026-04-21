@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <h2 style="color:#1a1a2e;">📚 Courses</h2>
+    {% if user.role in 'admin,trainer' %}
+    <a href="{% url 'create_course' %}" class="btn btn-primary">+ New Course</a>
+    {% endif %}
+</div>
+
+{% if courses %}
+<div class="grid-3">
+    {% for course in courses %}
+    <div class="card" style="border-top: 4px solid #e94560; transition: transform 0.2s;"
+         onmouseover="this.style.transform='translateY(-4px)'"
+         onmouseout="this.style.transform='translateY(0)'">
+        <h3 style="margin-bottom:10px; color:#1a1a2e;">{{ course.title }}</h3>
+        <p style="color:#888; font-size:13px; margin-bottom:16px; min-height:40px;">
+            {{ course.description|truncatewords:15 }}
+        </p>
+        <div style="font-size:12px; color:#aaa; margin-bottom:16px;">
+            📹 {{ course.videos.count }} videos &nbsp;|&nbsp;
+            👥 {{ course.assigned_students.count }} students
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="{% url 'course_detail' course.id %}" class="btn btn-secondary btn-sm">View</a>
+            {% if user.role in 'admin,trainer' %}
+            <a href="{% url 'add_video' course.id %}" class="btn btn-primary btn-sm">+ Video</a>
+            <a href="{% url 'assign_students' course.id %}" class="btn btn-sm" style="background:#f0f2f5; color:#333;">Assign</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align:center; padding:60px;">
+    <div style="font-size:48px; margin-bottom:16px;">📭</div>
+    <h3 style="color:#888;">No courses found</h3>
+    {% if user.role in 'admin,trainer' %}
+    <p style="color:#aaa; margin:10px 0 20px;">Create your first course to get started</p>
+    <a href="{% url 'create_course' %}" class="btn btn-primary">Create Course</a>
+    {% else %}
+    <p style="color:#aaa;">You are not enrolled in any courses yet.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

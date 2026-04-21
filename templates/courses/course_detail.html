@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div>
+        <h2 style="color:#1a1a2e;">{{ course.title }}</h2>
+        <p style="color:#888; margin-top:6px;">{{ course.description }}</p>
+    </div>
+    {% if user.role in 'admin,trainer' %}
+    <div style="display:flex; gap:10px;">
+        <a href="{% url 'add_video' course.id %}" class="btn btn-primary">+ Add Video</a>
+        <a href="{% url 'assign_students' course.id %}" class="btn btn-secondary">Assign Students</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="grid-2">
+    <div>
+        <div class="card">
+            <h2>📹 Videos ({{ videos.count }})</h2>
+            {% if videos %}
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                {% for video in videos %}
+                <a href="{% url 'watch_video' video.id %}"
+                   style="display:flex; align-items:center; gap:14px; padding:14px;
+                   background:#f8f9fa; border-radius:10px; text-decoration:none;
+                   color:#333; transition:background 0.2s;"
+                   onmouseover="this.style.background='#fde8ec'"
+                   onmouseout="this.style.background='#f8f9fa'">
+                    <div style="width:48px; height:48px; background:#e94560; border-radius:10px;
+                        display:flex; align-items:center; justify-content:center;
+                        color:white; font-size:20px; flex-shrink:0;">▶</div>
+                    <div>
+                        <div style="font-weight:600; font-size:14px;">{{ video.title }}</div>
+                        <div style="font-size:12px; color:#aaa; margin-top:2px;">Click to watch</div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color:#888; text-align:center; padding:30px;">No videos yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <h2>👥 Enrolled Students ({{ course.assigned_students.count }})</h2>
+            {% if course.assigned_students.all %}
+            <table>
+                <tr><th>Name</th><th>Email</th></tr>
+                {% for student in course.assigned_students.all %}
+                <tr>
+                    <td>{{ student.full_name }}</td>
+                    <td style="font-size:12px; color:#888;">{{ student.email }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p style="color:#888; text-align:center; padding:20px;">No students assigned yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>ℹ️ Course Info</h2>
+            <table>
+                <tr><td style="color:#888;">Created by</td><td>{{ course.created_by.full_name }}</td></tr>
+                <tr><td style="color:#888;">Created</td><td>{{ course.created_at|date:"d M Y" }}</td></tr>
+                <tr><td style="color:#888;">Status</td>
+                    <td>{% if course.is_active %}<span style="color:green;">Active</span>
+                    {% else %}<span style="color:red;">Inactive</span>{% endif %}</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

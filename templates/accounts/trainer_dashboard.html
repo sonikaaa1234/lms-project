@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Trainer Dashboard{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:20px; color:#1a1a2e;">🏫 Trainer Dashboard</h2>
+
+<div class="grid-2" style="margin-bottom:24px;">
+    <div class="stat-card">
+        <div class="number">{{ courses.count }}</div>
+        <div class="label">My Courses</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">
+            {% with total=0 %}
+            {{ courses|length }}
+            {% endwith %}
+        </div>
+        <div class="label">Active Courses</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>My Courses
+        <a href="{% url 'create_course' %}" class="btn btn-primary btn-sm" style="float:right;">+ New Course</a>
+    </h2>
+    {% if courses %}
+    <table>
+        <tr><th>Course</th><th>Students</th><th>Videos</th><th>Actions</th></tr>
+        {% for course in courses %}
+        <tr>
+            <td><strong>{{ course.title }}</strong></td>
+            <td>{{ course.assigned_students.count }}</td>
+            <td>{{ course.videos.count }}</td>
+            <td>
+                <a href="{% url 'course_detail' course.id %}" class="btn btn-secondary btn-sm">View</a>
+                <a href="{% url 'add_video' course.id %}" class="btn btn-primary btn-sm">+ Video</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p style="color:#888; text-align:center; padding:30px;">No courses yet. Create your first course!</p>
+    {% endif %}
+</div>
+{% endblock %}

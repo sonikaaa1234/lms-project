@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:20px; color:#1a1a2e;">👑 Admin Dashboard</h2>
+
+<div class="grid-3" style="margin-bottom:28px;">
+    <div class="stat-card">
+        <div class="number">{{ users.count }}</div>
+        <div class="label">Total Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ courses.count }}</div>
+        <div class="label">Total Courses</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ users|length }}</div>
+        <div class="label">Active Sessions</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Quick Actions</h2>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <a href="{% url 'manage_users' %}" class="btn btn-primary">👥 Manage Users</a>
+            <a href="{% url 'create_course' %}" class="btn btn-secondary">📚 Create Course</a>
+            <a href="{% url 'course_list' %}" class="btn btn-secondary">📋 View All Courses</a>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Recent Users</h2>
+        <table>
+            <tr><th>Name</th><th>Role</th><th>Status</th></tr>
+            {% for u in users|slice:":5" %}
+            <tr>
+                <td>{{ u.full_name }}</td>
+                <td><span class="badge badge-{{ u.role }}">{{ u.role }}</span></td>
+                <td>{% if u.is_active %}✅{% else %}❌{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

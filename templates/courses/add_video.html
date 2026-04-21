@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Add Video{% endblock %}
+{% block content %}
+<div class="card" style="max-width:600px; margin:0 auto;">
+    <h2>📹 Add Video to "{{ course.title }}"</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Video Title</label>
+            <input type="text" name="title" required placeholder="e.g. Introduction to Python">
+        </div>
+        <div class="form-group">
+            <label>YouTube URL</label>
+            <input type="url" name="youtube_url" required
+                placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="form-group">
+            <label>Order</label>
+            <input type="number" name="order" value="{{ course.videos.count|add:1 }}" min="1">
+        </div>
+        <div style="display:flex; gap:12px;">
+            <button type="submit" class="btn btn-primary">Add Video</button>
+            <a href="{% url 'course_detail' course.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

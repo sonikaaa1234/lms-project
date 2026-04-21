@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:20px; color:#1a1a2e;">🎓 Student Dashboard</h2>
+
+<div class="stat-card" style="margin-bottom:24px;">
+    <div class="number">{{ courses.count }}</div>
+    <div class="label">Enrolled Courses</div>
+</div>
+
+<div class="card">
+    <h2>My Courses</h2>
+    {% if courses %}
+    <div class="grid-2">
+        {% for course in courses %}
+        <div class="card" style="border-left: 4px solid #e94560;">
+            <h3 style="margin-bottom:8px;">{{ course.title }}</h3>
+            <p style="color:#888; font-size:13px; margin-bottom:16px;">{{ course.description|truncatewords:20 }}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:13px; color:#555;">📹 {{ course.videos.count }} videos</span>
+                <a href="{% url 'course_detail' course.id %}" class="btn btn-primary btn-sm">Start Learning</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:#888; text-align:center; padding:30px;">You are not enrolled in any courses yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

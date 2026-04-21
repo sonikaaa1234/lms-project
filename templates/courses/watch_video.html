@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}{{ video.title }}{% endblock %}
+{% block content %}
+
+<style>
+    .video-wrapper { position:relative; background:#000; border-radius:12px; overflow:hidden; margin-bottom:20px; }
+    .video-wrapper iframe { width:100%; aspect-ratio:16/9; display:block; }
+    .watermark { position:absolute; color:rgba(255,255,255,0.18); font-size:15px; font-weight:700;
+        pointer-events:none; white-space:nowrap; z-index:10; user-select:none;
+        text-shadow:1px 1px 3px rgba(0,0,0,0.5); transition: top 1s, left 1s; }
+    .no-select { -webkit-user-select:none; user-select:none; }
+    .security-bar { background:#1a1a2e; color:#aaa; padding:10px 20px; border-radius:8px;
+        font-size:12px; margin-bottom:16px; display:flex; justify-content:space-between; }
+    .video-link { display:block; padding:10px; border-radius:8px; text-decoration:none;
+        color:#333; margin-bottom:6px; }
+    .video-link.active { background:#fde8ec; }
+    .video-link.inactive { background:#f8f9fa; }
+</style>
+
+<div class="security-bar no-select">
+    <span>🔒 Secure Session &nbsp;|&nbsp; {{ user.full_name }} &nbsp;|&nbsp; {{ user.email }}</span>
+    <span>⚠️ This session is being tracked</span>
+</div>
+
+<div class="video-wrapper no-select" oncontextmenu="return false;">
+    <div class="watermark" id="watermark">{{ watermark }}</div>
+    {% if youtube_id %}
+    <iframe src="https://www.youtube.com/embed/{{ youtube_id }}?rel=0&modestbranding=1"
+        frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope"
+        allowfullscreen></iframe>
+    {% else %}
+    <div style="color:white; text-align:center; padding:60px;">Invalid YouTube URL</div>
+    {% endif %}
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>{{ video.title }}</h2>
+        <p style="color:#888; font-size:13px; margin-top:8px;">
+            Course: <strong>{{ course.title }}</strong>
+        </p>
+        <a href="{% url 'course_detail' course.id %}" class="btn btn-secondary btn-sm"
+            style="margin-top:16px;">← Back to Course</a>
+    </div>
+    <div class="card">
+        <h2>Other Videos</h2>
+        {% for v in course.videos.all %}
+        {% if v.id == video.id %}
+        <a href="{% url 'watch_video' v.id %}" class="video-link active">▶ {{ v.title }}</a>
+        {% else %}
+        <a href="{% url 'watch_video' v.id %}" class="video-link inactive">{{ v.title }}</a>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'PrintScreen' || (e.ctrlKey && ['s','u','p'].includes(e.key))) {
+            e.preventDefault();
+        }
+    });
+    setInterval(() => {
+        const wm = document.getElementById('watermark');
+        wm.style.top  = Math.floor(Math.random() * 80) + '%';
+        wm.style.left = Math.floor(Math.random() * 70) + '%';
+    }, 5000);
+</script>
+{% endblock %}

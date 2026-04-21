@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Trainer Dashboard</title>
+    <title>Student Dashboard</title>
 
     <style>
         body {
@@ -11,7 +11,7 @@
         }
 
         .navbar {
-            background: #764ba2;
+            background: #4facfe;
             padding: 15px;
             color: white;
             display: flex;
@@ -25,7 +25,7 @@
 
         .logout-btn {
             background: white;
-            color: #764ba2;
+            color: #4facfe;
             padding: 8px 15px;
             border-radius: 6px;
             text-decoration: none;
@@ -33,7 +33,7 @@
         }
 
         .logout-btn:hover {
-            background: #eee;
+            background: #e6f0ff;
         }
 
         .container {
@@ -60,7 +60,7 @@
         .btn {
             display: inline-block;
             padding: 10px 15px;
-            background: #764ba2;
+            background: #4facfe;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -68,7 +68,7 @@
         }
 
         .btn:hover {
-            background: #5a3d8a;
+            background: #007bff;
         }
     </style>
 </head>
@@ -76,7 +76,7 @@
 <body>
 
 <div class="navbar">
-    <h2>🎓 LMS - Trainer</h2>
+    <h2> LMS - Student</h2>
     <a href="/logout/" class="logout-btn">Logout</a>
 </div>
 
@@ -86,33 +86,32 @@
     </div>
 
     <div class="card">
-        <h3> Create Course</h3>
-        <p>Create and manage your courses.</p>
-      <!---  <a href="#" class="btn">Create Course</a>-->
-        <a href="/courses/create-course/" class="btn">Create Course</a>
+        <h3> My Courses</h3>
+        <p>View all courses assigned to you.</p>
+       <!-- <a href="#" class="btn">View Courses</a> -->
+        <a href="/courses/my-courses/" class="btn">View Courses</a>
     </div>
 
     <div class="card">
-        <h3> Add Videos</h3>
-        <p>Upload YouTube video links to courses.</p>
-       <!-- <a href="#" class="btn">Add Videos</a> -->
-        <a href="/courses/add-video/" class="btn">Add Videos</a>
+        <h3> Watch Videos</h3>
+        <p>Access course videos securely.</p>
+       <a href="/courses/my-courses/" class="btn">Go to Videos</a>
+        
     </div>
 
     <div class="card">
-        <h3> Manage Students</h3>
-        <p>View and manage enrolled students.</p>
-       <!-- <a href="#" class="btn">Manage Students</a> -->
-        <a href="/courses/manage-students/" class="btn">Manage Students</a>
+        <h3> Profile</h3>
+        <p>Check your account details.</p>
+       <a href="/profile/" class="btn">View Profile</a>
+     
     </div>
     <div class="card">
-    <h3> Add Quiz Questions</h3>
-    <p>Create questions for your courses.</p>
-
-    <a href="/courses/add-question/" class="btn">
-        Add Questions
-    </a>
-</div>
+        <h3>Take Quiz</h3>
+        <p>Check your account details.</p>
+       <a href="/courses/quiz/1/" class="btn">Take Quiz</a>
+         
+     
+    </div>
 </div>
 
 </body>

@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 
 class User(AbstractUser):
     ROLE_CHOICES = (
@@ -16,3 +17,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+ 
+
+
+#User = settings.AUTH_USER_MODEL
+
+class OTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)

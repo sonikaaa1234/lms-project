@@ -22,11 +22,11 @@ from django.conf import settings
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),   # keep admin
-    path('', include('lsmapp.urls')), # connect your app
-    path('courses/', include('courses.urls')),
+    path('admin/', admin.site.urls),   # admin site redirect
+    path('', include('lsmapp.urls')), # connecting to Lmsapp app
+    path('courses/', include('courses.urls')), # connecting to courses app
 ]
 
-#calling static files later
-#urlpatterns += static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+ 
+ 
+#urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

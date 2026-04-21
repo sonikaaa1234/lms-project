@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Profile</title>
+    <title>Enter Questions</title>
 
     <style>
         body {
@@ -19,8 +19,8 @@
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 350px;
             text-align: center;
+            width: 350px;
         }
 
         h2 {
@@ -28,27 +28,33 @@
             color: #333;
         }
 
-        p {
-            font-size: 16px;
-            margin: 10px 0;
-            color: #555;
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
         }
 
-        b {
-            color: #333;
+        input:focus {
+            border-color: #764ba2;
+            outline: none;
+            box-shadow: 0 0 5px rgba(118,75,162,0.3);
         }
 
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 15px;
+        button {
+            width: 100%;
+            padding: 12px;
             background: #764ba2;
             color: white;
-            text-decoration: none;
+            border: none;
             border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
-        .btn:hover {
+        button:hover {
             background: #5a3d8a;
         }
     </style>
@@ -58,13 +64,13 @@
 
 <div class="card">
 
-<h2>Profile</h2>
+<h2>Enter Number of Questions</h2>
 
-<p><b>Username:</b> {{ request.user.username }}</p>
-<p><b>Role:</b> {{ request.user.role }}</p>
-<p><b>Email:</b> {{ request.user.email }}</p>
-
-<a href="/dashboard/" class="btn">Back to Dashboard</a>
+<form method="POST">
+  {% csrf_token %}
+  <input type="number" name="count" placeholder="Enter number of questions" required>
+  <button type="submit">Next</button>
+</form>
 
 </div>
 

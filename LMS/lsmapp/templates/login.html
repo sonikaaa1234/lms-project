@@ -80,7 +80,7 @@
 <body>
 
 <div class="login-container">
-    <h2>🔐 Login</h2>
+    <h2> Login</h2>
 
     <form method="POST">
         {% csrf_token %}
@@ -88,7 +88,7 @@
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
 
-        <!-- Role selection optional (not needed for auth, but okay for your project) -->
+        
         <select name="role">
             <option value="">Select Role</option>
             <option value="student">Student</option>
@@ -97,6 +97,9 @@
         </select>
 
         <button type="submit"> Login</button>
+    
+    <a href="/forgot-password/" class="signup-link">Forgot Password?</a>
+
     </form>
 
     {% if error %}
@@ -105,6 +108,8 @@
 
     <a href="/signup/" class="signup-link">New user? Signup</a>
 </div>
+ 
+
 
 </body>
 </html>

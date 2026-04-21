@@ -1,31 +1,21 @@
 from django.shortcuts import render, redirect
-#from .models import Course
 from django.contrib.auth.decorators import login_required
-#from .models import Video
-from .models import Enrollment
+import random
+from django.shortcuts import get_object_or_404
+from .models import Course, Video, Enrollment, Progress, Question
 from lsmapp.models import User
-from .models import Video, Course
-from .models import Progress, Video
-from django.shortcuts import redirect
-from .models import Progress, Video
-from .models import Question, Choice, Course
-import random
-from .models import Question, Choice
-from django.contrib import messages
-import random
+from django.urls import reverse
+from .models import Quiz
+
 @login_required
 def create_course(request):
     if request.method == 'POST':
-        title = request.POST['title']
-        description = request.POST['description']
-
         Course.objects.create(
-            title=title,
-            description=description,
+            title=request.POST['title'],
+            description=request.POST['description'],
             trainer=request.user
         )
-
-        return redirect('trainer_dashboard')
+        return redirect('dashboard')
 
     return render(request, 'create_course.html')
 
@@ -33,32 +23,31 @@ def create_course(request):
 @login_required
 def add_video(request):
     if request.method == 'POST':
-        title = request.POST['title']
+        course = get_object_or_404(Course, id=request.POST.get('course'))
         link = request.POST['link']
-        course_id = request.POST['course']
-
+        if "watch?v=" in link:
+            video_id = link.split("watch?v=")[-1]
+            link = f"https://www.youtube.com/embed/{video_id}"
         Video.objects.create(
-            title=title,
-            youtube_link=link,
-            course_id=course_id
-        )
+          title=request.POST['title'],
+          youtube_link=link,
+          #  youtube_link=request.POST['link'],
+          course=course   # passing course obj instead of Id
+)
 
-        return redirect('trainer_dashboard')
+        return redirect('dashboard')
 
     courses = Course.objects.filter(trainer=request.user)
     return render(request, 'add_video.html', {'courses': courses})
 
+
 @login_required
 def manage_students(request):
     if request.method == 'POST':
-        student_id = request.POST['student']
-        course_id = request.POST['course']
-
         Enrollment.objects.create(
-            student_id=student_id,
-            course_id=course_id
+            student_id=request.POST['student'],
+            course_id=request.POST['course']
         )
-
         return redirect('dashboard')
 
     students = User.objects.filter(role='student')
@@ -76,10 +65,9 @@ def student_courses(request):
     return render(request, 'student_courses.html', {'enrollments': enrollments})
 
 
-
 @login_required
 def course_videos(request, course_id):
-    course = Course.objects.get(id=course_id)
+    course = get_object_or_404(Course, id=course_id)
     videos = Video.objects.filter(course=course)
 
     total = videos.count()
@@ -89,22 +77,24 @@ def course_videos(request, course_id):
         completed=True
     ).count()
 
-    progress = 0
-    if total > 0:
-        progress = int((completed / total) * 100)
+    progress = int((completed / total) * 100) if total > 0 else 0
 
     return render(request, 'course_videos.html', {
         'course': course,
         'videos': videos,
         'progress': progress
-    }) 
+    })
+
+
 @login_required
 def profile(request):
     return render(request, 'profile.html')
 
-def mark_complete(request, video_id):
-    video = Video.objects.get(id=video_id)
 
+@login_required
+def mark_complete(request, video_id):
+    #video = Video.objects.get(id=video_id)
+    video = get_object_or_404(Video, id=video_id)
     Progress.objects.get_or_create(
         student=request.user,
         video=video,
@@ -114,75 +104,69 @@ def mark_complete(request, video_id):
     return redirect('course_videos', course_id=video.course.id)
 
 
-def mark_complete(request, video_id):
-    video = Video.objects.get(id=video_id)
-
-    Progress.objects.get_or_create(
-        student=request.user,
-        video=video,
-        defaults={'completed': True}
-    )
-
-    return redirect('course_videos', course_id=video.course.id)
-
-
-from django.contrib import messages
-import random
-
-def add_question(request):
-    courses = Course.objects.all()
-
-    if request.method == 'POST':
-
-        # 🔥 AUTO GENERATE (FOR TRAINER)
-        if 'count' in request.POST:
-            count = int(request.POST.get('count'))
-            course_id = request.POST.get('gen_course')
-
-            all_questions = list(Question.objects.filter(course_id=course_id))
-
-            selected = random.sample(all_questions, min(count, len(all_questions)))
-
-            # ✅ DO NOT SHOW QUIZ HERE
-            messages.success(request, f"{len(selected)} questions selected for quiz!")
-
-            return redirect('trainer_dashboard')  # go back
-
-        # ✅ MANUAL ADD
-        course_id = request.POST.get('course')
-        question_text = request.POST.get('question')
-        correct = request.POST.get('correct')
-
-        q = Question.objects.create(
-            course_id=course_id,
-            text=question_text
-        )
-
-        options = [
-            request.POST.get('opt1'),
-            request.POST.get('opt2'),
-            request.POST.get('opt3'),
-            request.POST.get('opt4')
-        ]
-
-        for i, opt in enumerate(options, start=1):
-            Choice.objects.create(
-                question=q,
-                text=opt,
-                is_correct=(str(i) == correct)
-            )
-
-        messages.success(request, "Question added successfully!")
-
-    return render(request, 'add_question.html', {'courses': courses})
-
-def take_quiz(request, course_id):
-    all_questions = list(Question.objects.filter(course_id=course_id))
-
-    count = 5  # or dynamic later
-    questions = random.sample(all_questions, min(count, len(all_questions)))
+# take quizz function for trainer for assign quizz for student accoording to respective courses
+@login_required
+def take_quiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    questions = Question.objects.filter(quiz=quiz)
 
     return render(request, 'take_quiz.html', {
-        'questions': questions,
-        'total': len(questions)
+        'quiz': quiz,
+        'questions': questions
+    })
+
+# function for trainer creating quizz
+@login_required
+def create_quiz(request):
+    courses = Course.objects.filter(trainer=request.user)
+
+    if request.method == "POST":
+        course_id = request.POST.get('course')
+        duration = request.POST.get('duration')
+
+        quiz = Quiz.objects.create(
+            course_id=course_id,
+            duration=duration
+        )
+        return redirect(f'/courses/question-count/?quiz_id={quiz.id}')
+
+     
+    return render(request, 'create_quiz.html', {
+        'courses': courses
+    })
+        
+#   Enter question count
+@login_required
+def question_count(request):
+    quiz_id = request.GET.get('quiz_id')
+
+    if request.method == "POST":
+        count = request.POST.get('count')
+        return redirect(f'/courses/add-question/?count={count}&quiz_id={quiz_id}')
+
+    return render(request, 'question_count.html')
+
+
+# Adding multiple questions for quizz
+@login_required
+def add_question(request):
+    count = int(request.GET.get('count', 1))
+    quiz_id = request.GET.get('quiz_id')   #GET QUIZ ID
+
+    if request.method == "POST":
+        for i in range(count):
+            Question.objects.create(
+                quiz_id=quiz_id,    
+                text=request.POST.get(f'question_{i}'),
+                option1=request.POST.get(f'option1_{i}'),
+                option2=request.POST.get(f'option2_{i}'),
+                option3=request.POST.get(f'option3_{i}'),
+                option4=request.POST.get(f'option4_{i}'),
+                correct_option=request.POST.get(f'correct_{i}')
+            )
+
+        return redirect('dashboard')
+
+    return render(request, 'add_multiple_questions.html', {
+        'count': range(count)
     })

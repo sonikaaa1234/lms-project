@@ -3,20 +3,19 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import User
 import uuid
-from django.contrib.auth.models import User
+from django.contrib.auth import login
 from django.contrib.sessions.models import Session
-#from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+import random
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
+from .models import OTP
  
- 
-
 # Home Page
 def home(request):
     return render(request, 'home.html')
 
-
-# Signup
 def signup(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -24,12 +23,16 @@ def signup(request):
         password = request.POST['password']
         role = request.POST['role']
 
+        #  creating users
         user = User.objects.create_user(
             username=username,
             email=email,
-            password=password,
-            role=role
+            password=password
         )
+
+        # assigning roles 
+        user.role = role
+        user.save()
 
         login(request, user)
         return redirect('dashboard')
@@ -37,25 +40,25 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-# Login
-from django.contrib.auth import authenticate, login
-from .models import User
-
+# Login function
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        role = request.POST['role']
-
+       #creating session for user
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
 
-            # ❗ check if user is active
+            # checking if user is active
             if not user.is_active:
                 return render(request, 'login.html', {'error': 'User disabled'})
 
-            # ✅ SINGLE SESSION LOGIC
+            # session exists
+            if not request.session.session_key:
+                request.session.create()
+
+            #  single session logic
             session_id = str(uuid.uuid4())
 
             user.active_session = session_id
@@ -70,7 +73,6 @@ def user_login(request):
             return render(request, 'login.html', {'error': 'Invalid credentials'})
 
     return render(request, 'login.html')
-
 # Logout
 def user_logout(request):
     logout(request)
@@ -80,6 +82,9 @@ def user_logout(request):
 # Dashboard
 @login_required
 def dashboard(request):
+    if request.session.get('session_id') != request.user.active_session:
+        logout(request)
+        return redirect('login')
     if request.user.role == 'student':
         return render(request, 'student_dashboard.html')
 
@@ -89,8 +94,6 @@ def dashboard(request):
     else:
         return render(request, 'admin_dashboard.html')
     
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def profile(request):
@@ -115,3 +118,63 @@ def view_sessions(request):
 def force_logout(request, session_key):
     Session.objects.filter(session_key=session_key).delete()
     return redirect('sessions')
+
+
+
+
+User = get_user_model()
+
+
+#  function for send OTP
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+
+            otp = str(random.randint(100000, 999999))
+
+            OTP.objects.create(user=user, otp=otp)
+
+            print("OTP:", otp)  # shows in terminal
+
+            request.session['reset_user'] = user.id
+
+            return redirect('verify_otp')
+
+        except User.DoesNotExist:
+            return render(request, 'forgot_password.html', {'error': 'Email not found'})
+
+    return render(request, 'forgot_password.html')
+
+
+# function for verify OTP
+def verify_otp(request):
+    if request.method == "POST":
+        entered_otp = request.POST.get('otp')
+        user_id = request.session.get('reset_user')
+
+        otp_obj = OTP.objects.filter(user_id=user_id).last()
+
+        if otp_obj and otp_obj.otp == entered_otp:
+            return redirect('reset_password')
+
+        return render(request, 'verify_otp.html', {'error': 'Invalid OTP'})
+
+    return render(request, 'verify_otp.html')
+
+
+#  function for  reset pass
+def reset_password(request):
+    if request.method == "POST":
+        password = request.POST.get('password')
+        user_id = request.session.get('reset_user')
+
+        user = User.objects.get(id=user_id)
+        user.password = make_password(password)
+        user.save()
+
+        return redirect('/login/')
+
+    return render(request, 'reset_password.html')

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Learning Management System - LMS" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>LMS - Learning Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script>
+      // Django template context variables
+      window.DJANGO = {
+        'apiUrl': '{% if request.build_absolute_uri %}{{ request.build_absolute_uri }}/api{% else %}/api{% endif %}',
+        'csrfToken': '{{ csrf_token }}',
+        'user': {% if user.is_authenticated %}{
+            'id': {{ user.id }},
+            'username': '{{ user.username }}',
+            'email': '{{ user.email }}',
+            'role': '{{ user.role }}'
+        }{% else %}null{% endif %}
+      };
+    </script>
+    <script src="/static/js/bundle.js"></script>
+  </body>
+</html>

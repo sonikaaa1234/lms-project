@@ -65,3 +65,5 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+cred.txt
+*.txt
